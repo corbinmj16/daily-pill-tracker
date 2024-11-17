@@ -1,115 +1,163 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import {useState} from "react";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+    DialogHeader,
+    DialogFooter,
+    DialogTrigger
+} from '@/components/ui/dialog';
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const current = new Date();
+const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function getNumberOfDaysInCurrentMonth(): Date[] {
+    const year = current.getFullYear();
+    const month = current.getMonth() + 1;
+    const d = new Date(year, month, 0);
+    const days = Array.from({ length: d.getDate() }, (v, i) => new Date(year, month, i + 1));
+
+    return days;
+}
+
+import { Medicine } from "@/types";
+import {Button} from "@/components/ui/button";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    // const medicines: Medicine[] = [
+    //     {
+    //         name: 'B12',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Thyrostim',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'DIM',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Black Seed Oil',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'SAM-e',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Pectasol',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Vitamin D',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Zinc',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Magnesium',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Perfect Amino Protein',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Progesterone',
+    //         description: 'I need this for something specific'
+    //     },
+    //     {
+    //         name: 'Trazodone',
+    //         description: 'I need this for something specific'
+    //     },
+    // ];
+    const [newMedicineName, setNewMedicineName] = useState<string>('');
+    const [newMedicineDescription, setNewMedicineDescription] = useState<string>('');
+    const [newMedicineTime, setNewMedicineTime] = useState<string>('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    function handleAddMedicine() {
+        const newMed: Medicine = {
+            name: newMedicineName,
+            description: newMedicineDescription,
+            time: newMedicineTime
+        };
+
+        localStorage.setItem('medicines', JSON.stringify(newMed));
+    }
+
+    return (
+        <div>
+            <h1 className="text-2xl">{months[current.getMonth()]} {current.getDate()}, {current.getFullYear()}</h1>
+            <h2 className="text-sm">{weekdays[current.getDay()]}</h2>
+
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button>Add Medicine</Button>
+                </DialogTrigger>
+
+                <DialogContent className='bg-white'>
+                    <DialogHeader>
+                        <DialogTitle>Add Medicine</DialogTitle>
+                        <DialogDescription>This will be added to your list of daily medicines/vitamins.</DialogDescription>
+                    </DialogHeader>
+
+                    <div className='space-y-5'>
+                        <div>
+                            <Label htmlFor="medicine_name" className='font-bold'>Medicine Name</Label>
+                            <Input
+                                name="medicine_name"
+                                id="medicine_name"
+                                type='text'
+                                placeholder='Vitamin B12'
+                                onChange={(e) => setNewMedicineName(e.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="medicine_description" className='font-bold'>Medicine Description</Label>
+                            <Input
+                                name="medicine_description"
+                                id="medicine_description"
+                                type='text'
+                                placeholder='Vitamin B12 Description'
+                                onChange={(e) => setNewMedicineDescription(e.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <Label className='font-bold'>When do you take this?</Label>
+                            <RadioGroup defaultValue="compact" onValueChange={(value) => setNewMedicineTime(value)}>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="morning" id="morning" />
+                                    <Label htmlFor="morning">Morning</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="afternoon" id="afternoon"/>
+                                    <Label htmlFor="afternoon">Afternoon</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="night" id="night"/>
+                                    <Label htmlFor="night">Night</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button onClick={handleAddMedicine}>Submit</Button>
+                    </DialogFooter>
+
+                </DialogContent>
+            </Dialog>
+
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
