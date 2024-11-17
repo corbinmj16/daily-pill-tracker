@@ -15,14 +15,14 @@ const current = new Date();
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-function getNumberOfDaysInCurrentMonth(): Date[] {
-    const year = current.getFullYear();
-    const month = current.getMonth() + 1;
-    const d = new Date(year, month, 0);
-    const days = Array.from({ length: d.getDate() }, (v, i) => new Date(year, month, i + 1));
-
-    return days;
-}
+// function getNumberOfDaysInCurrentMonth(): Date[] {
+//     const year = current.getFullYear();
+//     const month = current.getMonth() + 1;
+//     const d = new Date(year, month, 0);
+//     const days = Array.from({ length: d.getDate() }, (v, i) => new Date(year, month, i + 1));
+//
+//     return days;
+// }
 
 import { Medicine } from "@/types";
 import {Button} from "@/components/ui/button";
