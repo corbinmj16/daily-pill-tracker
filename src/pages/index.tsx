@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -79,18 +79,43 @@ export default function Home() {
     //         description: 'I need this for something specific'
     //     },
     // ];
+    const [medicines, setMedicines] = useState<Medicine[] | []>([]);
     const [newMedicineName, setNewMedicineName] = useState<string>('');
     const [newMedicineDescription, setNewMedicineDescription] = useState<string>('');
     const [newMedicineTime, setNewMedicineTime] = useState<string>('');
+
+    function getMedicinesFromStorage(): void {
+        const storageMeds = localStorage.getItem("medicines");
+
+        if (!storageMeds) {
+            // if not medicines in storage add an empty array
+            localStorage.setItem('medicines', JSON.stringify([]));
+            // set the apps medicines
+            setMedicines([]);
+        } else {
+            // set app medicines to what's stored
+            setMedicines(JSON.parse(storageMeds));
+        }
+    }
+
+    useEffect(() => {
+        getMedicinesFromStorage()
+    }, [])
 
     function handleAddMedicine() {
         const newMed: Medicine = {
             name: newMedicineName,
             description: newMedicineDescription,
             time: newMedicineTime
-        };
+        }
 
-        localStorage.setItem('medicines', JSON.stringify(newMed));
+        setMedicines((prevArr) => [...prevArr, newMed]);
+
+        localStorage.setItem('medicines', JSON.stringify([...medicines, newMed]));
+
+        setNewMedicineName('')
+        setNewMedicineDescription('')
+        setNewMedicineTime('')
     }
 
     return (
@@ -117,6 +142,7 @@ export default function Home() {
                                 id="medicine_name"
                                 type='text'
                                 placeholder='Vitamin B12'
+                                value={newMedicineName}
                                 onChange={(e) => setNewMedicineName(e.target.value)}
                             />
                         </div>
@@ -128,13 +154,14 @@ export default function Home() {
                                 id="medicine_description"
                                 type='text'
                                 placeholder='Vitamin B12 Description'
+                                value={newMedicineDescription}
                                 onChange={(e) => setNewMedicineDescription(e.target.value)}
                             />
                         </div>
 
                         <div>
                             <Label className='font-bold'>When do you take this?</Label>
-                            <RadioGroup defaultValue="compact" onValueChange={(value) => setNewMedicineTime(value)}>
+                            <RadioGroup defaultValue="compact" onValueChange={(value) => setNewMedicineTime(value)} value={newMedicineTime}>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="morning" id="morning" />
                                     <Label htmlFor="morning">Morning</Label>
@@ -158,6 +185,13 @@ export default function Home() {
                 </DialogContent>
             </Dialog>
 
+            {medicines && medicines.map((m) => (
+                <div key={m.name}>
+                    <p>{m.name}</p>
+                    <p>{m.description}</p>
+                    <p>{m.time}</p>
+                </div>
+            ))}
         </div>
     );
 }
