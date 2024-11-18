@@ -1,6 +1,9 @@
 import {useEffect, useState} from "react";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox"
+import { Separator } from "@/components/ui/separator"
 import {
     Dialog,
     DialogContent,
@@ -14,12 +17,10 @@ import {
     Card,
     CardContent,
     CardDescription,
-    // CardFooter,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-
-
 
 const current = new Date();
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -115,6 +116,7 @@ export default function Home() {
 
     function handleAddMedicine() {
         const newMed: Medicine = {
+            id: window.crypto.randomUUID(),
             name: newMedicineName,
             description: newMedicineDescription,
             time: newMedicineTime
@@ -132,7 +134,7 @@ export default function Home() {
 
     return (
         <div className="max-w-xl mx-auto px-4">
-            <header className="text-center">
+            <header className="text-center mt-4">
                 <h1 className="text-2xl">{months[current.getMonth()]} {current.getDate()}, {current.getFullYear()}</h1>
                 <h2 className="text-sm">{weekdays[current.getDay()]}</h2>
             </header>
@@ -199,7 +201,7 @@ export default function Home() {
                 </DialogContent>
             </Dialog>
 
-            <main className="text-center grid gap-3 grid-cols-1 md:grid-cols-2">
+            <main className="text-center grid gap-3 grid-cols-1">
                 {medicines.length <= 0 && (
                     <>
                         <h2 className="text-lg font-bold">No list of medicines/vitamins.</h2>
@@ -210,17 +212,24 @@ export default function Home() {
                 )}
                 
                 {medicines && medicines.map((m) => (
-                    <Card key={m.name}>
+                    <Card key={m.id}>
                         <CardHeader>
                             <CardTitle>{m.name}</CardTitle>
                             <CardDescription>{m.description}</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <p>Card Content</p>
+                        <CardContent className="flex gap-4 justify-center">
+                            {['morning', 'afternoon', 'night'].map((when, i, arr) => (
+                                <div key={i} className="flex space-x-2">
+                                    <Checkbox id={m.id} checked={when === m.time} />
+                                    <Label htmlFor={m.id}>{when}</Label>
+
+                                    {i < (arr.length - 1) && <Separator orientation="vertical" />}
+                                </div>
+                            ))}
                         </CardContent>
-                        {/* <CardFooter>
-                            <p>Card Footer</p>
-                        </CardFooter> */}
+                        <CardFooter>
+                            Taken in: {" "} <Badge>{m.time}</Badge>
+                        </CardFooter>
                     </Card>
                 ))}
             </main>
