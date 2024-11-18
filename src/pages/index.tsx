@@ -10,6 +10,16 @@ import {
     DialogFooter,
     DialogTrigger
 } from '@/components/ui/dialog';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+
+
 
 const current = new Date();
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -83,6 +93,7 @@ export default function Home() {
     const [newMedicineName, setNewMedicineName] = useState<string>('');
     const [newMedicineDescription, setNewMedicineDescription] = useState<string>('');
     const [newMedicineTime, setNewMedicineTime] = useState<string>('');
+    const [isNewModalOpen, setIsNewModalOpen] = useState<boolean>(false);
 
     function getMedicinesFromStorage(): void {
         const storageMeds = localStorage.getItem("medicines");
@@ -116,15 +127,18 @@ export default function Home() {
         setNewMedicineName('')
         setNewMedicineDescription('')
         setNewMedicineTime('')
+        setIsNewModalOpen(!isNewModalOpen)
     }
 
     return (
-        <div>
-            <h1 className="text-2xl">{months[current.getMonth()]} {current.getDate()}, {current.getFullYear()}</h1>
-            <h2 className="text-sm">{weekdays[current.getDay()]}</h2>
+        <div className="max-w-xl mx-auto px-4">
+            <header className="text-center">
+                <h1 className="text-2xl">{months[current.getMonth()]} {current.getDate()}, {current.getFullYear()}</h1>
+                <h2 className="text-sm">{weekdays[current.getDay()]}</h2>
+            </header>
 
-            <Dialog>
-                <DialogTrigger asChild>
+            <Dialog open={isNewModalOpen} onOpenChange={() => setIsNewModalOpen(!isNewModalOpen)}>
+                <DialogTrigger asChild className="my-10">
                     <Button>Add Medicine</Button>
                 </DialogTrigger>
 
@@ -185,13 +199,31 @@ export default function Home() {
                 </DialogContent>
             </Dialog>
 
-            {medicines && medicines.map((m) => (
-                <div key={m.name}>
-                    <p>{m.name}</p>
-                    <p>{m.description}</p>
-                    <p>{m.time}</p>
-                </div>
-            ))}
+            <main className="text-center grid gap-3 grid-cols-1 md:grid-cols-2">
+                {medicines.length <= 0 && (
+                    <>
+                        <h2 className="text-lg font-bold">No list of medicines/vitamins.</h2>
+                        <p>
+                            Click the <span className="italic font-bold">Add Medicine</span> button to start your list
+                        </p>
+                    </>
+                )}
+                
+                {medicines && medicines.map((m) => (
+                    <Card key={m.name}>
+                        <CardHeader>
+                            <CardTitle>{m.name}</CardTitle>
+                            <CardDescription>{m.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p>Card Content</p>
+                        </CardContent>
+                        {/* <CardFooter>
+                            <p>Card Footer</p>
+                        </CardFooter> */}
+                    </Card>
+                ))}
+            </main>
         </div>
     );
 }
